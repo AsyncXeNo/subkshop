@@ -53,9 +53,13 @@ async def main() -> None:
 
                 price = float(driver.find_element(By.CSS_SELECTOR, '.product__title .price__regular').get_attribute('innerText').replace('$', '').replace('USD', '').replace(',', '').strip())
 
-                main_image = driver.find_element(By.CSS_SELECTOR, '.product__gallery img').get_attribute('src')
+                try:
+                    main_image = driver.find_element(By.CSS_SELECTOR, '.product__media.selected img').get_attribute('src')
+                except Exception:
+                    main_image = driver.find_element(By.CSS_SELECTOR, '.product__media img').get_attribute('src')
 
-                images = [main_image]
+                image_divs = driver.find_elements(By.CSS_SELECTOR, '.product__media img')
+                images = [image.get_attribute('src') for image in image_divs]
 
                 description = driver.find_element(By.CSS_SELECTOR, '.product__text').get_attribute('innerText').strip()
 
@@ -80,10 +84,15 @@ async def main() -> None:
                     ).click()
                     time.sleep(0.5)
 
+                    try:
+                        variant_image = driver.find_element(By.CSS_SELECTOR, '.product__media.selected img').get_attribute('src')
+                    except Exception:
+                        variant_image = driver.find_element(By.CSS_SELECTOR, '.product__media img').get_attribute('src')
+
                     variant_info.append({
                         'name': variant_name,
                         'price': float(driver.find_element(By.CSS_SELECTOR, '.product__title .price__regular').get_attribute('innerText').replace('$', '').replace('USD', '').replace(',', '').strip()),
-                        'image': driver.find_element(By.CSS_SELECTOR, '.product__media img').get_attribute('src')
+                        'image': variant_image
                     })
 
                 data.append({
